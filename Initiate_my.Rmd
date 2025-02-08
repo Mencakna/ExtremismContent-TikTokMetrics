@@ -1,0 +1,187 @@
+---
+title: "Initiate.My"
+output: html_document
+date: "2025-02-07"
+---
+
+Question: I am curious to know which types content would gain the most followers, number of likes, comments, saves, & shares?
+
+#Step 1: Uploading dataset
+```{r}
+library(readr)
+tik_tok_data <- read_csv("~/Downloads/tik_tok_data.csv")
+```
+
+#Step 2: Exploring dataset
+```{r}
+str(tik_tok_data)
+unique(tik_tok_data$`Content Description`) # There's an issue with the cases in the dataset; we have 18 categories
+```
+
+# Step 3: Data Cleaning of the Content Description
+```{r}
+library(dplyr)
+library(stringr)
+
+# Normalize and categorize content descriptions
+tik_tok_data_clean <- tik_tok_data %>%
+  mutate(
+    `Content Description`= case_when(
+      str_detect(tolower(`Content Description`), "supremacy") ~ "Malay Supremacy",
+      str_detect(tolower(`Content Description`), "victimisation") ~ "Malay Victimisation",
+      str_detect(tolower(`Content Description`), "anti[- ]?minorities") ~ "Anti-Minorities",
+      str_detect(tolower(`Content Description`), "anti[- ]?migrant|refugees") ~ "Anti-Migrant/Refugees",
+      str_detect(tolower(`Content Description`), "threat|incitement to violence") ~ "Threat/Incitement to Violence",
+      str_detect(tolower(`Content Description`), "slur|verbal attack") ~ "Slurs/Verbal Attacks",
+      str_detect(tolower(`Content Description`), "extremist symbol|panji hitam") ~ "Extremist Symbols",
+      str_detect(tolower(`Content Description`), "antisemetic") ~ "Antisemitic",
+      str_detect(tolower(`Content Description`), "glorification|sympathy") ~ "Glorification/Sympathy",
+      str_detect(tolower(`Content Description`), "conspiracy") ~ "Conspiracy Theories",
+      TRUE ~ `Content Description` # Default to original if not matched
+    )
+  )
+
+unique(tik_tok_data_clean$`Content Description`) #Condensed to 10 categories
+```
+
+# Step 4: Analysis
+## Step 4.1: Followers by content description
+Anti migrant/refugees gets the most followers
+```{r}
+# Creating the table
+followers_by_content_description<- tik_tok_data_clean %>% 
+  group_by(`Content Description`) %>% 
+  summarize(total_followers = sum(`Number of followers`, na.rm = TRUE)) %>% 
+  arrange(total_followers)
+
+# Printing the table
+print(followers_by_content_description)
+
+library(ggplot2)
+library(scales)  # For numeric formatting
+
+ggplot(followers_by_content_description, aes(x = reorder(`Content Description`, total_followers), y = total_followers)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +  # Flip for better readability
+  scale_y_continuous(labels = comma) +  # Convert to numeric format
+  labs(
+    title = "Followers by Content Description",
+    x = "Content Description",
+    y = "Total Followers"
+  ) +
+  theme_minimal()
+```
+
+## Step 4.2: Likes by content description
+Extremist symbols gets the most like
+```{r}
+# Creating the table
+likes_by_content_description<- tik_tok_data_clean %>% 
+  group_by(`Content Description`) %>% 
+  summarize(total_likes = sum(`Number of likes`, na.rm = TRUE)) %>% 
+  arrange(total_likes)
+
+# Printing the table
+print(followers_by_content_description)
+
+library(ggplot2)
+library(scales)  # For numeric formatting
+
+ggplot(likes_by_content_description, aes(x = reorder(`Content Description`, total_likes), y = total_likes)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +  # Flip for better readability
+  scale_y_continuous(labels = comma) +  # Convert to numeric format
+  labs(
+    title = "Likes by Content Description",
+    x = "Content Description",
+    y = "Total Likes"
+  ) +
+  theme_minimal()
+```
+
+## Step 4.3: Comments by content description
+Anti-Minorities gets the most comments
+```{r}
+# Creating the table
+comments_by_content_description<- tik_tok_data_clean %>% 
+  group_by(`Content Description`) %>% 
+  summarize(total_comments = sum(`Number of comments`, na.rm = TRUE)) %>% 
+  arrange(total_comments)
+
+# Printing the table
+print(comments_by_content_description)
+
+library(ggplot2)
+library(scales)  # For numeric formatting
+
+ggplot(comments_by_content_description, aes(x = reorder(`Content Description`, total_comments), y = total_comments)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +  # Flip for better readability
+  scale_y_continuous(labels = comma) +  # Convert to numeric format
+  labs(
+    title = "Comments by Content Description",
+    x = "Content Description",
+    y = "Total Comments"
+  ) +
+  theme_minimal()
+```
+
+## Step 4.4: Save by content description
+Malay supremacy gets the most saves
+```{r}
+# Creating the table
+save_by_content_description<- tik_tok_data_clean %>% 
+  group_by(`Content Description`) %>% 
+  summarize(total_save = sum(`Number of saves`, na.rm = TRUE)) %>% 
+  arrange(total_save)
+
+# Printing the table
+print(save_by_content_description)
+
+library(ggplot2)
+library(scales)  # For numeric formatting
+
+ggplot(save_by_content_description, aes(x = reorder(`Content Description`, total_save), y = total_save)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +  # Flip for better readability
+  scale_y_continuous(labels = comma) +  # Convert to numeric format
+  labs(
+    title = "Saves by Content Description",
+    x = "Content Description",
+    y = "Total Saves"
+  ) +
+  theme_minimal()
+```
+
+## Step 4.4: Shares by content description
+Malay supremacy gets the most shares
+```{r}
+# Creating the table
+shares_by_content_description<- tik_tok_data_clean %>% 
+  group_by(`Content Description`) %>% 
+  summarize(total_shares = sum(`Number of shares`, na.rm = TRUE)) %>% 
+  arrange(total_shares)
+
+# Printing the table
+print(shares_by_content_description)
+
+library(ggplot2)
+library(scales)  # For numeric formatting
+
+ggplot(shares_by_content_description, aes(x = reorder(`Content Description`, total_shares), y = total_shares)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +  # Flip for better readability
+  scale_y_continuous(labels = comma) +  # Convert to numeric format
+  labs(
+    title = "Shares by Content Description",
+    x = "Content Description",
+    y = "Total Shares"
+  ) +
+  theme_minimal()
+```
+
+Conclusion:
+1. Malay supremacy content will get you the most shares & saves
+2. Anti-minorities will get you the most comments
+3. Extremist symbols will get you the most likes
+4. Anti migrant/refugees will get you the most followers (perhaps has the most)
